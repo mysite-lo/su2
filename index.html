@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title id="pageTitle">Доступ до посилання</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      animation: fadeIn 0.6s ease;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+      text-align: left;
+      animation: slideUp 0.5s ease;
+    }
+
+    .icon {
+      width: 40px;
+      height: 40px;
+      background: #ffe6ec;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      animation: pulse 1.5s infinite;
+    }
+
+    .text {
+      font-size: 14px;
+      color: #333;
+    }
+
+    #openBtnWrapper {
+      margin-top: 20px;
+      display: none;
+    }
+
+    button {
+      padding: 14px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #ff4d6d;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1 id="title"></h1>
+
+  <div class="step">
+    <div class="icon">👆</div>
+    <div class="text" id="step1"></div>
+  </div>
+
+  <div class="step">
+    <div class="icon">🌐</div>
+    <div class="text" id="step2"></div>
+  </div>
+
+  <div id="openBtnWrapper">
+    <button id="btn" onclick="goToOffer()"></button>
+  </div>
+</div>
+
+<script>
+  const REDIRECT_URL = 'https://tone.affomelody.com/click?pid=122199&offer_id=25&sub3=test';
+
+  const translations = {
+    en: {
+      title: "To access the link,<br>follow these<br>2 simple steps:",
+      step1: 'Tap the "..." menu<br>in the top right corner',
+      step2: 'Select "Open in browser"',
+      btn: "I opened it in browser",
+      pageTitle: "Access to the link"
+    },
+    de: {
+      title: "Um auf den Link zuzugreifen,<br>folgen Sie diesen<br>2 einfachen Schritten:",
+      step1: 'Tippen Sie auf das "..." Menü<br>oben rechts',
+      step2: 'Wählen Sie "Im Browser öffnen"',
+      btn: "Ich habe es im Browser geöffnet",
+      pageTitle: "Zugriff auf den Link"
+    },
+    uk: {
+      title: "Щоб отримати доступ до посилання,<br>виконайте наступні<br>2 прості кроки:",
+      step1: 'Натисніть на меню "..."<br>у правому верхньому куті',
+      step2: 'Оберіть "Відкрити в браузері"',
+      btn: "Я відкрив у браузері",
+      pageTitle: "Доступ до посилання"
+    },
+    pl: {
+      title: "Aby uzyskać dostęp do linku,<br>wykonaj te<br>2 proste kroki:",
+      step1: 'Kliknij menu "..."<br>w prawym górnym rogu',
+      step2: 'Wybierz "Otwórz w przeglądarce"',
+      btn: "Otworzyłem w przeglądarce",
+      pageTitle: "Dostęp do linku"
+    },
+    fr: {
+      title: "Pour accéder au lien,<br>suivez ces<br>2 étapes simples :",
+      step1: 'Appuyez sur le menu "..."<br>en haut à droite',
+      step2: 'Sélectionnez "Ouvrir dans le navigateur"',
+      btn: "Je l’ai ouvert dans le navigateur",
+      pageTitle: "Accès au lien"
+    },
+    it: {
+      title: "Per accedere al link,<br>segui questi<br>2 semplici passaggi:",
+      step1: 'Tocca il menu "..."<br>in alto a destra',
+      step2: 'Seleziona "Apri nel browser"',
+      btn: "L’ho aperto nel browser",
+      pageTitle: "Accesso al link"
+    },
+    es: {
+      title: "Para acceder al enlace,<br>sigue estos<br>2 simples pasos:",
+      step1: 'Toca el menú "..."<br>en la esquina superior derecha',
+      step2: 'Selecciona "Abrir en el navegador"',
+      btn: "Lo abrí en el navegador",
+      pageTitle: "Acceso al enlace"
+    },
+    pt: {
+      title: "Para acessar o link,<br>siga estes<br>2 passos simples:",
+      step1: 'Toque no menu "..."<br>no canto superior direito',
+      step2: 'Selecione "Abrir no navegador"',
+      btn: "Abri no navegador",
+      pageTitle: "Acesso ao link"
+    },
+    nl: {
+      title: "Om toegang te krijgen tot de link,<br>volg deze<br>2 eenvoudige stappen:",
+      step1: 'Tik op het menu "..."<br>rechtsboven',
+      step2: 'Selecteer "Openen in browser"',
+      btn: "Ik heb het in de browser geopend",
+      pageTitle: "Toegang tot de link"
+    },
+    sv: {
+      title: "För att få tillgång till länken,<br>följ dessa<br>2 enkla steg:",
+      step1: 'Tryck på menyn "..."<br>uppe till höger',
+      step2: 'Välj "Öppna i webbläsaren"',
+      btn: "Jag öppnade i webbläsaren",
+      pageTitle: "Tillgång till länken"
+    },
+    no: {
+      title: "For å få tilgang til lenken,<br>følg disse<br>2 enkle trinnene:",
+      step1: 'Trykk på "..." menyen<br>øverst til høyre',
+      step2: 'Velg "Åpne i nettleser"',
+      btn: "Jeg åpnet i nettleser",
+      pageTitle: "Tilgang til lenken"
+    },
+    da: {
+      title: "For at få adgang til linket,<br>følg disse<br>2 enkle trin:",
+      step1: 'Tryk på menuen "..."<br>øverst til højre',
+      step2: 'Vælg "Åbn i browser"',
+      btn: "Jeg åbnede i browser",
+      pageTitle: "Adgang til link"
+    },
+    fi: {
+      title: "Päästäksesi linkkiin,<br>noudata näitä<br>2 yksinkertaista vaihetta:",
+      step1: 'Napauta "..." valikkoa<br>yläkulmassa',
+      step2: 'Valitse "Avaa selaimessa"',
+      btn: "Avasin selaimessa",
+      pageTitle: "Pääsy linkkiin"
+    },
+    cs: {
+      title: "Pro přístup k odkazu,<br>postupujte podle těchto<br>2 jednoduchých kroků:",
+      step1: 'Klikněte na menu "..."<br>vpravo nahoře',
+      step2: 'Vyberte "Otevřít v prohlížeči"',
+      btn: "Otevřel jsem v prohlížeči",
+      pageTitle: "Přístup k odkazu"
+    },
+    tr: {
+      title: "Bağlantıya erişmek için,<br>şu<br>2 basit adımı izleyin:",
+      step1: '"..." menüsüne dokunun<br>sağ üst köşede',
+      step2: '"Tarayıcıda aç" seçin',
+      btn: "Tarayıcıda açtım",
+      pageTitle: "Bağlantıya erişim"
+    }
+  };
+
+  function detectLanguage() {
+    const lang = (navigator.language || "").toLowerCase();
+    const short = lang.split("-")[0];
+
+    if (translations[short]) return short;
+
+    return "en"; // ✅ дефолт тепер англійська
+  }
+
+  function applyTranslations() {
+    const lang = detectLanguage();
+    const t = translations[lang];
+
+    document.getElementById("title").innerHTML = t.title;
+    document.getElementById("step1").innerHTML = t.step1;
+    document.getElementById("step2").innerHTML = t.step2;
+    document.getElementById("btn").innerText = t.btn;
+    document.getElementById("pageTitle").innerText = t.pageTitle;
+  }
+
+  function goToOffer() {
+    window.location.href = REDIRECT_URL;
+  }
+
+  function isInAppBrowser() {
+    const ua = navigator.userAgent || "";
+    return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|WebView|wv/i.test(ua);
+  }
+
+  applyTranslations();
+
+  if (!isInAppBrowser()) {
+    setTimeout(() => {
+      document.getElementById("openBtnWrapper").style.display = "block";
+    }, 1200);
+  }
+</script>
+
+</body>
+</html>
