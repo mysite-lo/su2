@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Відкрий у зовнішньому браузері</title>
+  <title>Open in browser</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,72 +26,99 @@
       padding: 32px;
       backdrop-filter: blur(12px);
       box-shadow: 0 10px 40px rgba(0,0,0,.35);
+      position: relative;
+      overflow: hidden;
     }
     h1 { font-size: 30px; margin-bottom: 16px; }
     p { font-size: 18px; line-height: 1.5; opacity: .95; }
-    .steps {
-      margin-top: 24px;
-      text-align: left;
-      font-size: 20px;
-      line-height: 1.9;
-    }
+    .steps { margin-top: 24px; text-align: left; font-size: 20px; line-height: 1.9; }
     .icon { font-size: 54px; margin-bottom: 20px; }
     .loader {
       margin: 24px auto 0;
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       border: 4px solid rgba(255,255,255,.25);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 1s linear infinite;
       display: none;
     }
+    .hand {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 52px;
+      animation: point 1.2s infinite ease-in-out;
+      transform-origin: top right;
+    }
     @keyframes spin { to { transform: rotate(360deg);} }
+    @keyframes point {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(-8px,8px) scale(1.15); }
+    }
   </style>
 </head>
 <body>
-  <div class="card" id="card">
+  <div class="card">
+    <div class="hand">👆</div>
     <div class="icon">↗️</div>
-    <h1 id="title">Відкрий у браузері</h1>
-    <p id="desc">Щоб продовжити, відкрий це посилання у зовнішньому браузері.</p>
-    <div class="steps" id="steps">
-      1. Натисни <b>⋯</b> у верхньому правому куті<br>
-      2. Обери <b>«Open in browser»</b><br>
-      3. Зачекай автоматичний перехід
-    </div>
+    <h1 id="title"></h1>
+    <p id="desc"></p>
+    <div class="steps" id="steps"></div>
     <div class="loader" id="loader"></div>
   </div>
 
-  <script>
-    const REDIRECT_URL = 'https://www.google.com';
+<script>
+const REDIRECT_URL = 'https://www.google.com';
 
-    function isTikTokWebView() {
-      const ua = navigator.userAgent || navigator.vendor || window.opera;
-      // Типові маркери TikTok in-app browser
-      return /TikTok|musical_ly|BytedanceWebview/i.test(ua);
-    }
+const i18n = {
+  en:{t:'Open in browser',d:'To continue, open this link in your external browser.',s:['Tap ⋯ in the top-right corner','Choose "Open in browser"','Wait for automatic redirect']},
+  uk:{t:'Відкрий у браузері',d:'Щоб продовжити, відкрий це посилання у зовнішньому браузері.',s:['Натисни ⋯ у верхньому правому куті','Обери "Відкрити у браузері"','Зачекай автоматичний перехід']},
+  de:{t:'Im Browser öffnen',d:'Öffne diesen Link im externen Browser.',s:['Tippe auf ⋯ oben rechts','Wähle „Im Browser öffnen“','Warte auf die automatische Weiterleitung']},
+  pl:{t:'Otwórz w przeglądarce',d:'Aby kontynuować, otwórz link w zewnętrznej przeglądarce.',s:['Kliknij ⋯ w prawym górnym rogu','Wybierz „Otwórz w przeglądarce”','Poczekaj na przekierowanie']},
+  fr:{t:'Ouvrir dans le navigateur',d:'Ouvrez ce lien dans votre navigateur externe.',s:['Appuyez sur ⋯ en haut à droite','Choisissez « Ouvrir dans le navigateur »','Attendez la redirection']},
+  da:{t:'Åbn i browser',d:'Åbn dette link i din eksterne browser.',s:['Tryk på ⋯ øverst til højre','Vælg "Åbn i browser"','Vent på viderestilling']},
+  no:{t:'Åpne i nettleser',d:'Åpne denne lenken i ekstern nettleser.',s:['Trykk på ⋯ øverst til høyre','Velg "Åpne i nettleser"','Vent på videresending']},
+  nl:{t:'Open in browser',d:'Open deze link in je externe browser.',s:['Tik op ⋯ rechtsboven','Kies "Open in browser"','Wacht op redirect']},
+  sv:{t:'Öppna i webbläsare',d:'Öppna länken i extern webbläsare.',s:['Tryck på ⋯ uppe till höger','Välj "Öppna i webbläsare"','Vänta på omdirigering']},
+  et:{t:'Ava brauseris',d:'Ava see link välises brauseris.',s:['Vajuta ⋯ paremas ülanurgas','Vali "Ava brauseris"','Oota ümbersuunamist']},
+  it:{t:'Apri nel browser',d:'Apri questo link nel browser esterno.',s:['Tocca ⋯ in alto a destra','Scegli "Apri nel browser"','Attendi il reindirizzamento']},
+  es:{t:'Abrir en navegador',d:'Abre este enlace en tu navegador externo.',s:['Pulsa ⋯ arriba a la derecha','Elige "Abrir en navegador"','Espera la redirección']},
+  'de-ch':{t:'Im Browser öffnen',d:'Öffne diesen Link im externen Browser.',s:['Tippe auf ⋯ oben rechts','Wähle „Im Browser öffnen“','Warte auf die automatische Weiterleitung']}
+};
 
-    function redirectNow() {
-      document.getElementById('title').innerText = 'Перенаправлення...';
-      document.getElementById('desc').innerText = 'Зараз відкриємо потрібну сторінку';
-      document.getElementById('steps').style.display = 'none';
-      document.getElementById('loader').style.display = 'block';
+function detectLang(){
+  let l=(navigator.language||'en').toLowerCase();
+  if(l.startsWith('de-ch')) return 'de-ch';
+  let code=l.split('-')[0];
+  return i18n[code] ? code : 'en';
+}
 
-      setTimeout(() => {
-        window.location.replace(REDIRECT_URL);
-      }, 800);
-    }
+function applyLang(){
+  const lang = detectLang();
+  const tr=i18n[lang];
+  document.documentElement.lang = lang;
+  document.title = tr.t;
+  document.getElementById('title').innerText = tr.t;
+  document.getElementById('desc').innerText = tr.d;
+  document.getElementById('steps').innerHTML = `1. ${tr.s[0]}<br>2. ${tr.s[1]}<br>3. ${tr.s[2]}`;
+}
 
-    // Логіка:
-    // Якщо всередині TikTok webview -> показуємо інструкцію.
-    // Якщо вже у зовнішньому браузері -> автоматичний редірект.
-    if (!isTikTokWebView()) {
-      redirectNow();
-    }
+function isTikTokWebView(){
+  const ua=navigator.userAgent||'';
+  return /TikTok|musical_ly|BytedanceWebview/i.test(ua);
+}
 
-    // debug в консоль
-    console.log('UA:', navigator.userAgent);
-    console.log('TikTok WebView:', isTikTokWebView());
-  </script>
+function redirectNow(){
+  document.getElementById('title').innerText='Redirecting...';
+  document.getElementById('desc').innerText='Opening destination...';
+  document.getElementById('steps').style.display='none';
+  document.querySelector('.hand').style.display='none';
+  document.getElementById('loader').style.display='block';
+  setTimeout(()=>window.location.replace(REDIRECT_URL),800);
+}
+
+applyLang();
+if(!isTikTokWebView()) redirectNow();
+</script>
 </body>
 </html>
