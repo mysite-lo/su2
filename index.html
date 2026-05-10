@@ -42,24 +42,30 @@
       animation: spin 1s linear infinite;
       display: none;
     }
-    .hand {
+    .pulse {
       position: absolute;
-      top: 14px;
-      right: 14px;
-      font-size: 52px;
-      animation: point 1.2s infinite ease-in-out;
-      transform-origin: top right;
+      top: 22px;
+      right: 22px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ff3355;
+      box-shadow: 0 0 0 rgba(255,51,85,.7);
+      animation: pulse 1.5s infinite;
     }
     @keyframes spin { to { transform: rotate(360deg);} }
-    @keyframes point {
-      0%,100% { transform: translate(0,0) scale(1); }
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,51,85,.7); }
+      70% { transform: scale(1.15); box-shadow: 0 0 0 22px rgba(255,51,85,0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,51,85,0); }
+    }
       50% { transform: translate(-8px,8px) scale(1.15); }
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="hand">👆</div>
+    <div class="pulse"></div>
     <div class="icon">↗️</div>
     <h1 id="title"></h1>
     <p id="desc"></p>
@@ -112,7 +118,7 @@ function redirectNow(){
   document.getElementById('title').innerText='Redirecting...';
   document.getElementById('desc').innerText='Opening destination...';
   document.getElementById('steps').style.display='none';
-  document.querySelector('.hand').style.display='none';
+  document.querySelector('.pulse').style.display='none';
   document.getElementById('loader').style.display='block';
   setTimeout(()=>window.location.replace(REDIRECT_URL),800);
 }
