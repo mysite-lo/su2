@@ -1,182 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading ...</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #2e015a, #6829b7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            text-align: center;
-            background-color: #472b71;
-            border-radius: 15px;
-            padding: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            color: white;
-        }
-
-        .container img {
-            border-radius: 10px;
-            width: 250px;
-            height: auto;
-        }
-
-        h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background-color: #835bdb;
-            border: none;
-            padding: 15px 30px;
-            color: white;
-            font-size: 16px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 10px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #6e48c5;
-        }
-
-        #alertText {
-            margin-top: 1rem;
-            background-color: rgb(31, 41, 55);
-            border-color: rgb(139, 92, 246);
-            border-width: 1px;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            max-width: 280px;
-        }
-
-        #alertText .status-title {
-            color: rgb(216, 180, 254);
-            font-weight: bold;
-            margin-bottom: 0.25rem;
-        }
-
-        #alertText .status-message {
-            color: rgb(209, 213, 219);
-        }
-
-        #alertText {
-            display: none;
-        }
-
-        .loader::before,
-        .loader::after {
-            content: "";
-            grid-area: 1/1;
-            border-radius: 50%;
-            background: inherit;
-            opacity: 0.915;
-            transform: rotate(30deg);
-        }
-
-        .loader::after {
-            opacity: 0.83;
-            transform: rotate(60deg);
-        }
-
-        @keyframes l23 {
-            100% {
-                transform: rotate(1turn)
-            }
-        }
-
-        .center {
-            max-width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        }
-    </style>
-
-    <script>
-        let link = 'google.com'; // СЮДА НУЖНО ДОБАВИТЬ ВАШУ СМАРТЛИНКУ ИЛИ ССЫЛКУ НА ОФФЕР/ОНЛИФАНС БЕЗ "https://" ВМЕСТО GOOGLE.COM
-        let redirectUrl = 'https://' + link;
-    </script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Відкрий у зовнішньому браузері</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #000000, #1f1f1f);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      max-width: 460px;
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    h1 { font-size: 30px; margin-bottom: 16px; }
+    p { font-size: 18px; line-height: 1.5; opacity: .95; }
+    .steps {
+      margin-top: 24px;
+      text-align: left;
+      font-size: 20px;
+      line-height: 1.9;
+    }
+    .icon { font-size: 54px; margin-bottom: 20px; }
+    .loader {
+      margin: 24px auto 0;
+      width: 42px;
+      height: 42px;
+      border: 4px solid rgba(255,255,255,.25);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg);} }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="center">
-            <div class="loader"></div>
-            <div id="countdown" style="display: none">3</div>
-        </h1>
-        <div>
-            <button onclick="openLink()">Open Link</button>
-            <button onclick="copyLink()">Copy Link</button>
-        </div>
-        <div id="alertText">
-            <div class="status-title">Status</div>
-            <div class="status-message">Loading ...</div>
-        </div>
+  <div class="card" id="card">
+    <div class="icon">↗️</div>
+    <h1 id="title">Відкрий у браузері</h1>
+    <p id="desc">Щоб продовжити, відкрий це посилання у зовнішньому браузері.</p>
+    <div class="steps" id="steps">
+      1. Натисни <b>⋯</b> у верхньому правому куті<br>
+      2. Обери <b>«Open in browser»</b><br>
+      3. Зачекай автоматичний перехід
     </div>
+    <div class="loader" id="loader"></div>
+  </div>
 
-    <script>
-        let countdownNumber = 3; 
-        const countdownElement = document.getElementById('countdown');
-        countdownElement.style.display = 'block';
+  <script>
+    const REDIRECT_URL = 'https://www.google.com';
 
-        const countdownInterval = setInterval(() => {
-            countdownNumber--;
-            countdownElement.innerText = countdownNumber; 
+    function isTikTokWebView() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      // Типові маркери TikTok in-app browser
+      return /TikTok|musical_ly|BytedanceWebview/i.test(ua);
+    }
 
-            if (countdownNumber <= 0) {
-                clearInterval(countdownInterval);
-                openLink();
-            }
-        }, 1000);
-    </script>
+    function redirectNow() {
+      document.getElementById('title').innerText = 'Перенаправлення...';
+      document.getElementById('desc').innerText = 'Зараз відкриємо потрібну сторінку';
+      document.getElementById('steps').style.display = 'none';
+      document.getElementById('loader').style.display = 'block';
 
-    <script>
-        const isAndroid = /Android/i.test(navigator.userAgent);
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        function copyLink() {
-            navigator.clipboard.writeText(redirectUrl).then(() => {
-                const alertText = document.getElementById("alertText");
-                alertText.style.display = "block";
-                alertText.querySelector(".status-title").innerText = "Status";
-                alertText.querySelector(".status-message").innerText = "Link copied to clipboard!";
-            }, () => {
-                const alertText = document.getElementById("alertText");
-                alertText.style.display = "block";
-                alertText.querySelector(".status-title").innerText = "Status";
-                alertText.querySelector(".status-message").innerText = "Failed to copy the link.";
-            });
-        }
-        function openLink() {
-            setTimeout(() => {
-                const alertText = document.getElementById("alertText");
-                alertText.style.display = "block";
-                alertText.querySelector(".status-title").innerText = "Status";
-                alertText.querySelector(".status-message").innerText = "If the link didn't open automatically, try copying it and opening it manually in another browser.";
-            }, 2000);
+      setTimeout(() => {
+        window.location.replace(REDIRECT_URL);
+      }, 800);
+    }
 
-            if (isAndroid) {
-                window.location.href = "intent://" + link + "#Intent;package=com.android.chrome;scheme=https;end";
-            }
-            if (isIOS) {
-                window.location.href = "x-safari-https://" + link;
-            }
-            window.open("https://" + link);
-        }
-        function initRedirectUrl(url) {
-            redirectUrl = url;
-            openLink();
-        }
-    </script>
+    // Логіка:
+    // Якщо всередині TikTok webview -> показуємо інструкцію.
+    // Якщо вже у зовнішньому браузері -> автоматичний редірект.
+    if (!isTikTokWebView()) {
+      redirectNow();
+    }
+
+    // debug в консоль
+    console.log('UA:', navigator.userAgent);
+    console.log('TikTok WebView:', isTikTokWebView());
+  </script>
 </body>
 </html>
